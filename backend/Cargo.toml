@@ -1,0 +1,59 @@
+[package]
+name = "arelis-backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# ── HTTP server ────────────────────────────────────────────────────────────────
+axum             = { version = "0.7", features = ["macros"] }
+tokio            = { version = "1",   features = ["full"] }
+tower-http       = { version = "0.5", features = ["cors", "trace"] }
+
+# ── Serialisation ──────────────────────────────────────────────────────────────
+serde            = { version = "1",   features = ["derive"] }
+serde_json       = "1"
+
+# ── Database (app data: invoices, customers, packs) ───────────────────────────
+sqlx             = { version = "0.8", features = ["runtime-tokio", "sqlite"] }
+
+# ── Seed encryption (AES-256-GCM) ─────────────────────────────────────────────
+aes-gcm          = "0.10"
+
+# ── BIP-39 mnemonic generation ─────────────────────────────────────────────────
+bip39            = "2"
+
+# ── Zcash wallet & key operations ─────────────────────────────────────────────
+# All released together — versions must be mutually compatible.
+zcash_primitives      = "0.28"
+zcash_client_backend  = "0.23"
+zcash_keys            = "0.14"
+zcash_address         = "0.12"
+# Modules that were extracted from zcash_primitives in the 0.16+ refactor:
+zcash_protocol        = "0.9"    # consensus, memo, value types
+sapling-crypto        = "0.7"    # Sapling note encryption / decryption
+zip32                 = "0.2"    # AccountId, DiversifierIndex, Scope
+zcash_note_encryption = "0.4"    # EphemeralKeyBytes (used by sapling-crypto)
+
+# ── lightwalletd gRPC (generated from proto/service.proto via build.rs) ────────
+tonic            = { version = "0.11", features = ["tls", "tls-roots"] }
+prost            = "0.12"
+
+# ── Utilities ──────────────────────────────────────────────────────────────────
+argon2           = "0.5"
+jsonwebtoken     = "9"
+uuid             = { version = "1", features = ["v4"] }
+dashmap          = "5"
+anyhow           = "1"
+thiserror        = "1"
+tracing          = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+chrono           = { version = "0.4", features = ["serde"] }
+dotenvy          = "0.15"
+rand             = "0.8"
+base64           = "0.22"
+hex              = "0.4"
+zeroize          = { version = "1", features = ["derive"] }
+
+[build-dependencies]
+tonic-build           = "0.11"
+protoc-bin-vendored   = "3"
