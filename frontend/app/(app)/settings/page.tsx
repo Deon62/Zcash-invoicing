@@ -68,8 +68,8 @@ export default function SettingsPage() {
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => {
-                    resetDemo();
+                  onClick={async () => {
+                    await resetDemo();
                     router.push("/dashboard");
                   }}
                 >
