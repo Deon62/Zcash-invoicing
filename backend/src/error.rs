@@ -29,7 +29,7 @@ impl IntoResponse for AppError {
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized".into()),
             AppError::Sqlx(e) => {
                 tracing::error!("db: {e}");
-                (StatusCode::INTERNAL_SERVER_ERROR, "database error".into())
+                (StatusCode::INTERNAL_SERVER_ERROR, format!("database error: {e}"))
             }
             AppError::Anyhow(e) => {
                 tracing::error!("internal: {e}");
