@@ -197,7 +197,11 @@ pub async fn create_invoice(
     let amount_kes = (amount_zec * ZEC_TO_KES).round() as i64;
 
     let diversifier_index = db::next_diversifier_index(&s.db, &bid).await?;
-    let id = format!("INV-{}-{:04}", chrono::Utc::now().year(), diversifier_index + 1);
+    let id = format!(
+        "INV-{}-{}",
+        chrono::Utc::now().year(),
+        &Uuid::new_v4().simple().to_string()[..8].to_uppercase()
+    );
     let memo = format!("Arelis \u{2022} payment for {} \u{2022} {}", id, customer.name);
 
     let wallet = s.get_wallet(&bid).await.map_err(AppError::Anyhow)?;
