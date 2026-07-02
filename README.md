@@ -83,38 +83,6 @@ The backend reads its config from `backend/.env` (loaded automatically via
 defaults for local development — only `WALLET_KEY` must be set before first
 run if you want wallet address derivation to work.
 
-```dotenv
-# SQLite database file path
-DATABASE_URL=sqlite:arelis.db
-
-# HTTP bind address
-BIND_ADDR=0.0.0.0:8081
-
-# JWT signing secret — change this in any shared/production environment
-JWT_SECRET=arelis-jwt-secret-change-in-production
-
-# Log level
-RUST_LOG=arelis_backend=debug,tower_http=debug
-
-# AES key used to encrypt wallet seeds at rest.
-# Generate once with:  openssl rand -hex 32
-# Keep this safe — losing it means you can't decrypt stored seeds.
-# (You can still recover funds from the 24-word mnemonic printed on first run.)
-WALLET_KEY=<hex-encoded-32-byte-key>
-
-# Zcash network: 'testnet' | 'mainnet'
-ZCASH_NETWORK=testnet
-
-# lightwalletd endpoint (used for future on-chain scanning)
-LIGHTWALLETD_URL=https://lightwalletd.testnet.electriccoin.co:9067
-```
-
-The frontend reads one variable from `frontend/.env.local`:
-
-```dotenv
-NEXT_PUBLIC_API_URL=http://localhost:8081   # default if unset
-```
-
 ---
 
 ## Tech stack
