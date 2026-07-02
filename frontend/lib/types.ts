@@ -6,6 +6,43 @@
  * here and only ever talks to the service module — never to mock data directly.
  */
 
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+export interface RegisterInput {
+  name: string;
+  taxPin: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  businessId: string;
+  /** Present only on registration — the 24-word BIP-39 mnemonic. Show once, then discard. */
+  mnemonic?: string;
+}
+
+// ── Customer management ───────────────────────────────────────────────────────
+
+export interface CreateCustomerInput {
+  name: string;
+  email: string;
+  taxPin?: string;
+}
+
+export interface UpdateCustomerInput {
+  name: string;
+  email: string;
+  taxPin?: string;
+}
+
+// ── Invoice lifecycle ─────────────────────────────────────────────────────────
+
 export type InvoiceStatus = "draft" | "awaiting_payment" | "paid";
 
 export type ReconStatus = "unreconciled" | "reconciled";
@@ -20,8 +57,8 @@ export interface Customer {
 
 export interface Business {
   name: string;
+  email: string;
   taxPin: string;
-  /** The wallet's account-level unified address (mocked). */
   unifiedAddress: string;
 }
 

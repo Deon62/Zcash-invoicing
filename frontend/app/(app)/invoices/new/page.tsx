@@ -39,8 +39,8 @@ export default function NewInvoicePage() {
   const [items, setItems] = useState<LineItem[]>([
     { description: "", quantity: 1, unitPriceZec: 1 },
   ]);
+  const [saving, setSaving] = useState(false);
 
-  // Auto invoice ID preview — the next sequential id the service will assign.
   const nextId = useMemo(() => {
     const seq = listInvoices().length + 1;
     return `INV-2026-${String(seq).padStart(4, "0")}`;
@@ -71,10 +71,15 @@ export default function NewInvoicePage() {
     setItems((prev) => prev.filter((_, i) => i !== idx));
   }
 
-  function onSave() {
-    if (!canSave) return;
-    const invoice = createInvoice({ customerId, lineItems: items, dueDate });
-    router.push(`/invoices/${invoice.id}`);
+  async function onSave() {
+    if (!canSave || saving) return;
+    setSaving(true);
+    try {
+      const invoice = await createInvoice({ customerId, lineItems: items, dueDate });
+      router.push(`/invoices/${invoice.id}`);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -194,7 +199,6 @@ export default function NewInvoicePage() {
           </Card>
         </div>
 
-        {/* Summary rail */}
         <div className="space-y-5">
           <Card className="sticky top-6">
             <CardHeader>
@@ -220,10 +224,11 @@ export default function NewInvoicePage() {
               </p>
               <Button
                 className="w-full"
-                disabled={!canSave}
+                disabled={!canSave || saving}
                 onClick={onSave}
               >
-                Create & generate payment request <ArrowRight />
+                {saving ? "Creating…" : "Create & generate payment request"}{" "}
+                <ArrowRight />
               </Button>
             </CardContent>
           </Card>

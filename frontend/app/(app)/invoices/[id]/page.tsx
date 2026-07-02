@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import {
   ArrowLeft,
   CheckCircle2,
+  Loader2,
   Lock,
   ShieldCheck,
   Wallet,
@@ -37,6 +39,17 @@ export default function InvoiceDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const invoice = getInvoice(params.id);
+  const [simulating, setSimulating] = useState(false);
+
+  async function handleSimulate() {
+    if (!invoice || simulating) return;
+    setSimulating(true);
+    try {
+      await simulatePaymentReceived(invoice.id);
+    } finally {
+      setSimulating(false);
+    }
+  }
 
   if (!invoice) {
     return (
@@ -237,9 +250,15 @@ export default function InvoiceDetailPage() {
                 <Button
                   className="w-full"
                   variant="success"
-                  onClick={() => simulatePaymentReceived(invoice.id)}
+                  disabled={simulating}
+                  onClick={handleSimulate}
                 >
-                  <Zap /> Simulate payment received
+                  {simulating ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Zap />
+                  )}{" "}
+                  {simulating ? "Processing…" : "Simulate payment received"}
                 </Button>
               </CardContent>
             </Card>
@@ -256,9 +275,15 @@ export default function InvoiceDetailPage() {
                 <Button
                   className="w-full"
                   variant="success"
-                  onClick={() => simulatePaymentReceived(invoice.id)}
+                  disabled={simulating}
+                  onClick={handleSimulate}
                 >
-                  <Zap /> Simulate payment received
+                  {simulating ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Zap />
+                  )}{" "}
+                  {simulating ? "Processing…" : "Simulate payment received"}
                 </Button>
               </CardContent>
             </Card>

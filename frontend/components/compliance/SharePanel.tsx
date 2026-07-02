@@ -8,6 +8,7 @@ import {
   FileCheck2,
   Info,
   KeyRound,
+  Loader2,
   ShieldCheck,
 } from "lucide-react";
 import {
@@ -68,6 +69,7 @@ export function SharePanel({
   const [selected, setSelected] = useState<Set<string>>(
     new Set(preselectInvoice ? [preselectInvoice] : paidInvoices.map((i) => i.id))
   );
+  const [generating, setGenerating] = useState(false);
 
   const included: Invoice[] = useMemo(() => {
     if (scope === "viewing_key") {
@@ -90,13 +92,18 @@ export function SharePanel({
     });
   }
 
-  function onGenerate() {
-    if (included.length === 0) return;
-    const pack =
-      scope === "viewing_key"
-        ? generateViewingKeyDisclosure({ start, end })
-        : generatePaymentDisclosurePack(included.map((i) => i.id));
-    onGenerated(pack.id);
+  async function onGenerate() {
+    if (included.length === 0 || generating) return;
+    setGenerating(true);
+    try {
+      const pack =
+        scope === "viewing_key"
+          ? await generateViewingKeyDisclosure({ start, end })
+          : await generatePaymentDisclosurePack(included.map((i) => i.id));
+      onGenerated(pack.id);
+    } finally {
+      setGenerating(false);
+    }
   }
 
   return (
@@ -294,8 +301,17 @@ export function SharePanel({
                 selected receipts — every other transaction stays shielded.
               </div>
 
-              <Button className="w-full" disabled={included.length === 0} onClick={onGenerate}>
-                Generate pack <ArrowRight />
+              <Button
+                className="w-full"
+                disabled={included.length === 0 || generating}
+                onClick={onGenerate}
+              >
+                {generating ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <ArrowRight />
+                )}
+                {generating ? "Generating…" : "Generate pack"}
               </Button>
             </CardContent>
           </Card>

@@ -2,36 +2,44 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   FilePlus2,
   FileText,
   LayoutDashboard,
   ShieldCheck,
+  Users,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { BusinessMenu } from "@/components/BusinessMenu";
 import { cn } from "@/lib/utils";
 import { BRAND } from "@/lib/brand";
 import { useZcash } from "@/lib/useZcash";
+import { isLoggedIn } from "@/lib/zcashService";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/invoices", label: "Invoices", icon: FileText },
   { href: "/invoices/new", label: "Create invoice", icon: FilePlus2 },
-  // Privacy → disclosure → verification, all one flow on the Compliance page.
+  { href: "/customers", label: "Customers", icon: Users },
   { href: "/compliance", label: "Compliance", icon: ShieldCheck },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   useZcash();
   const pathname = usePathname();
+  const router = useRouter();
 
-  // Page content is driven by client-side store state (localStorage). Gate it on
-  // mount so the server-rendered markup and the first client render agree —
-  // navigations keep the tree alive, so this only ever runs once on hard load.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      router.replace("/login");
+    } else {
+      setMounted(true);
+    }
+  }, [router]);
+
+  if (!mounted) return null;
 
   return (
     // h-screen + overflow-hidden pins the shell to the viewport so only the main
@@ -86,15 +94,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="min-h-0 flex-1 overflow-y-auto">
           <main className="mx-auto w-full max-w-6xl p-5 md:p-8">
-            {mounted ? (
-              children
-            ) : (
-              <div className="space-y-4">
-                <div className="h-8 w-56 animate-pulse rounded-md bg-muted" />
-                <div className="h-40 w-full animate-pulse rounded-xl bg-muted" />
-                <div className="h-40 w-full animate-pulse rounded-xl bg-muted" />
-              </div>
-            )}
+            {children}
           </main>
 
           <footer className="border-t px-5 py-3 text-center text-xs text-muted-foreground">

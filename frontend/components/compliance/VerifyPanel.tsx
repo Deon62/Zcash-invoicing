@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -134,8 +134,12 @@ export function VerifyPanel({
 type RowState = "pending" | "verifying" | "verified";
 
 function PackVerification({ pack, onBack }: { pack: DisclosurePack; onBack: () => void }) {
-  const results: VerificationResult[] = useMemo(() => verifyDisclosure(pack), [pack]);
+  const [results, setResults] = useState<VerificationResult[]>([]);
   const [states, setStates] = useState<Record<string, RowState>>({});
+
+  useEffect(() => {
+    verifyDisclosure(pack).then(setResults).catch(console.error);
+  }, [pack]);
 
   function stateOf(id: string): RowState {
     return states[id] ?? "pending";

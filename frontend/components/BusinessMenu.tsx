@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Building2, ChevronsUpDown, LogOut, Settings, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getBusiness } from "@/lib/zcashService";
+import { getBusiness, logout } from "@/lib/zcashService";
 
 /**
  * The business-profile switcher pinned to the bottom of the sidebar. Click it
@@ -51,7 +51,8 @@ export function BusinessMenu() {
             <button
               onClick={() => {
                 setOpen(false);
-                router.push("/");
+                logout();
+                router.push("/login");
               }}
               className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
