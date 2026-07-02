@@ -12,7 +12,7 @@
  *     subscribers so every component re-renders with fresh data.
  */
 
-import { api } from "./api";
+import { api, AuthError } from "./api";
 import { BRAND } from "./brand";
 import type {
   AuthResponse,
@@ -73,7 +73,7 @@ interface CachedState {
 }
 
 const EMPTY: CachedState = {
-  business: { name: BRAND.name, taxPin: "", unifiedAddress: "" },
+  business: { name: BRAND.name, email: "", taxPin: "", unifiedAddress: "" },
   customers: [],
   invoices: [],
   packs: [],
@@ -138,8 +138,12 @@ export async function initFromBackend(): Promise<void> {
       cache = { business, customers, invoices, packs, balance, monthly, publicLedger, auditorLedger };
       initialized = true;
     } catch (err) {
-      console.error("Arelis: could not reach backend —", err);
-      // Keep empty defaults so the UI renders (shows loading state).
+      if (err instanceof AuthError) {
+        api.logout();
+        if (typeof window !== "undefined") window.location.replace("/login");
+        return;
+      }
+      console.warn("Arelis: could not reach backend —", err);
     }
     bump();
   })();
